@@ -2,7 +2,7 @@
 
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Platform, View, StyleSheet } from 'react-native';
+import { Animated, Platform, View, StyleSheet, InteractionManager } from 'react-native';
 import { NavigationStatePropType } from './TabViewPropTypes';
 import type {
   Scene,
@@ -24,6 +24,7 @@ type DefaultProps<T> = {
 type Props<T> = PagerProps & {
   navigationState: NavigationState<T>,
   onIndexChange: (index: number) => void,
+  tabChanged?: (index: number) => void,
   onPositionChange?: ({ value: number }) => void,
   initialLayout?: Layout,
   canJumpToTab?: (route: T) => boolean,
@@ -233,6 +234,9 @@ export default class TabViewAnimated<T: Route<*>> extends PureComponent<
         this.props.onRequestChangeTab(index);
       }
       this.props.onIndexChange(index);
+      InteractionManager.runAfterInteractions(() => {
+        this.props.tabChanged && this.props.tabChanged(index);
+      });
     }
   };
 
