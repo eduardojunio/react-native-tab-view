@@ -22,6 +22,8 @@ type Props<T> = PagerProps<T> & {
   renderScene: (props: SceneRendererProps<T> & Scene<T>) => ?React.Element<any>,
   renderHeader?: (props: SceneRendererProps<T>) => ?React.Element<any>,
   renderFooter?: (props: SceneRendererProps<T>) => ?React.Element<any>,
+  renderLeftSide?: (props: SceneRendererProps<T>) => ?React.Element<any>,
+  renderRightSide?: (props: SceneRendererProps<T>) => ?React.Element<any>,
   useNativeDriver?: boolean,
   style?: Style,
 };
@@ -65,6 +67,8 @@ export default class TabViewAnimated<T: *> extends React.Component<
     renderScene: PropTypes.func.isRequired,
     renderHeader: PropTypes.func,
     renderFooter: PropTypes.func,
+    renderLeftSide: PropTypes.func,
+    renderRightSide: PropTypes.func
   };
 
   static defaultProps = {
@@ -189,6 +193,8 @@ export default class TabViewAnimated<T: *> extends React.Component<
       renderPager,
       renderHeader,
       renderFooter,
+      renderLeftSide,
+      renderRightSide,
       ...rest
     } = this.props;
 
@@ -201,26 +207,30 @@ export default class TabViewAnimated<T: *> extends React.Component<
         style={[styles.container, this.props.style]}
       >
         {renderHeader && renderHeader(props)}
-        {renderPager({
-          ...props,
-          ...rest,
-          panX: this.state.panX,
-          offsetX: this.state.offsetX,
-          children: navigationState.routes.map((route, index) => {
-            const scene = this._renderScene({
-              ...props,
-              route,
-              index,
-              focused: index === navigationState.index,
-            });
+        <View style={styles.content}>
+          {renderLeftSide && renderLeftSide(props)}
+          {renderPager({
+            ...props,
+            ...rest,
+            panX: this.state.panX,
+            offsetX: this.state.offsetX,
+            children: navigationState.routes.map((route, index) => {
+              const scene = this._renderScene({
+                ...props,
+                route,
+                index,
+                focused: index === navigationState.index,
+              });
 
-            if (scene) {
-              return React.cloneElement(scene, { key: route.key });
-            }
+              if (scene) {
+                return React.cloneElement(scene, { key: route.key });
+              }
 
-            return scene;
-          }),
-        })}
+              return scene;
+            }),
+          })}
+          {renderRightSide && renderRightSide(props)}
+        </View>
         {renderFooter && renderFooter(props)}
       </View>
     );
@@ -232,4 +242,8 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden',
   },
+  content: {
+    flexDirection: 'row',
+    flex: 1
+  }
 });

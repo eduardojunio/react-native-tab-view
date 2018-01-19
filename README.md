@@ -107,6 +107,8 @@ Container component responsible for managing tab transitions.
 - `initialLayout` - optional object containing the initial `height` and `width`, can be passed to prevent the one frame delay in rendering
 - `renderHeader` - optional callback which returns a react element to use as top tab bar
 - `renderFooter` - optional callback which returns a react element to use as bottom tab bar
+- `renderLeftSide` - optional callback which returns a react element to use as left tab bar
+- `renderRightSide` - optional callback which returns a react element to use as right tab bar
 - `renderPager` - optional callback which returns a react element to handle swipe gesture and animation
 - `renderScene` - callback which returns a react element to use as a scene
 
