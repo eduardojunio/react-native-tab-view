@@ -1,7 +1,7 @@
 /* @flow */
 
 import Expo from 'expo';
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import {
   AsyncStorage,
   Platform,
@@ -19,6 +19,7 @@ import BottomBarIconTextExample from './BottomBarIconTextExample';
 import NoAnimationExample from './NoAnimationExample';
 import ScrollViewsExample from './ScrollViewsExample';
 import CoverflowExample from './CoverflowExample';
+import NativeDriverExample from './NativeDriverExample';
 
 const PERSISTENCE_KEY = 'index_persistence';
 
@@ -29,9 +30,16 @@ const EXAMPLE_COMPONENTS = [
   NoAnimationExample,
   ScrollViewsExample,
   CoverflowExample,
+  NativeDriverExample,
 ];
 
-export default class ExampleList extends PureComponent {
+type State = {
+  title: string,
+  index: number,
+  restoring: boolean,
+};
+
+export default class ExampleList extends React.Component<{}, State> {
   state = {
     title: 'Examples',
     index: -1,
@@ -39,7 +47,9 @@ export default class ExampleList extends PureComponent {
   };
 
   componentWillMount() {
-    this._restoreNavigationState();
+    if (process.env.NODE_ENV !== 'production') {
+      this._restoreNavigationState();
+    }
 
     [
       require('../assets/album-art-1.jpg'),
@@ -54,7 +64,9 @@ export default class ExampleList extends PureComponent {
   }
 
   _persistNavigationState = async (currentIndex: number) => {
-    await AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(currentIndex));
+    if (process.env.NODE_ENV !== 'production') {
+      await AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(currentIndex));
+    }
   };
 
   _restoreNavigationState = async () => {
@@ -131,6 +143,7 @@ export default class ExampleList extends PureComponent {
     return (
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
+        <Expo.KeepAwake />
         <View
           style={[
             styles.statusbar,
@@ -146,32 +159,30 @@ export default class ExampleList extends PureComponent {
               : null,
           ]}
         >
-          {index > -1
-            ? <TouchableOpacity
-                style={styles.button}
-                onPress={this._handleNavigateBack}
-              >
-                <Ionicons
-                  name={
-                    Platform.OS === 'android'
-                      ? 'md-arrow-back'
-                      : 'ios-arrow-back'
-                  }
-                  size={24}
-                  color={tintColor}
-                />
-              </TouchableOpacity>
-            : null}
+          {index > -1 ? (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={this._handleNavigateBack}
+            >
+              <Ionicons
+                name={
+                  Platform.OS === 'android' ? 'md-arrow-back' : 'ios-arrow-back'
+                }
+                size={24}
+                color={tintColor}
+              />
+            </TouchableOpacity>
+          ) : null}
           <Text style={[styles.title, tintColor ? { color: tintColor } : null]}>
             {index > -1 ? EXAMPLE_COMPONENTS[index].title : this.state.title}
           </Text>
           {index > -1 ? <View style={styles.button} /> : null}
         </View>
-        {index === -1
-          ? <ScrollView>
-              {EXAMPLE_COMPONENTS.map(this._renderItem)}
-            </ScrollView>
-          : ExampleComponent ? <ExampleComponent /> : null}
+        {index === -1 ? (
+          <ScrollView>{EXAMPLE_COMPONENTS.map(this._renderItem)}</ScrollView>
+        ) : ExampleComponent ? (
+          <ExampleComponent />
+        ) : null}
       </View>
     );
   }

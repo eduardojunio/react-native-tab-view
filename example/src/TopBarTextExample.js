@@ -1,24 +1,29 @@
 /* @flow */
 
-import React, { PureComponent } from 'react';
-import { StyleSheet } from 'react-native';
+import * as React from 'react';
+import { StyleSheet, Dimensions } from 'react-native';
 import { TabViewAnimated, TabBar } from 'react-native-tab-view';
 import SimplePage from './SimplePage';
 
-import type { NavigationState } from 'react-native-tab-view/types';
+import type { Route, NavigationState } from 'react-native-tab-view/types';
 
-type Route = {
-  key: string,
-  title: string,
+type State = NavigationState<
+  Route<{
+    key: string,
+    title: string,
+  }>
+>;
+
+const initialLayout = {
+  height: 0,
+  width: Dimensions.get('window').width,
 };
 
-type State = NavigationState<Route>;
-
-export default class TopBarTextExample extends PureComponent<void, *, State> {
+export default class TopBarTextExample extends React.Component<*, State> {
   static title = 'Scrollable top bar';
   static appbarElevation = 0;
 
-  state: State = {
+  state = {
     index: 1,
     routes: [
       { key: '1', title: 'First' },
@@ -28,24 +33,21 @@ export default class TopBarTextExample extends PureComponent<void, *, State> {
     ],
   };
 
-  _handleIndexChange = index => {
+  _handleIndexChange = index =>
     this.setState({
       index,
     });
-  };
 
-  _renderHeader = props => {
-    return (
-      <TabBar
-        {...props}
-        scrollEnabled
-        indicatorStyle={styles.indicator}
-        style={styles.tabbar}
-        tabStyle={styles.tab}
-        labelStyle={styles.label}
-      />
-    );
-  };
+  _renderHeader = props => (
+    <TabBar
+      {...props}
+      scrollEnabled
+      indicatorStyle={styles.indicator}
+      style={styles.tabbar}
+      tabStyle={styles.tab}
+      labelStyle={styles.label}
+    />
+  );
 
   _renderScene = ({ route }) => {
     switch (route.key) {
@@ -90,6 +92,7 @@ export default class TopBarTextExample extends PureComponent<void, *, State> {
         renderScene={this._renderScene}
         renderHeader={this._renderHeader}
         onIndexChange={this._handleIndexChange}
+        initialLayout={initialLayout}
       />
     );
   }

@@ -5,22 +5,22 @@ import { Animated, StyleSheet } from 'react-native';
 import { TabViewAnimated, TabBar } from 'react-native-tab-view';
 import BasicListView from './BasicListView';
 
-import type { NavigationState } from 'react-native-tab-view/types';
+import type { Route, NavigationState } from 'react-native-tab-view/types';
 
-type Route = {
-  key: string,
-  title: string,
-};
+type State = NavigationState<
+  Route<{
+    key: string,
+    title: string,
+  }>
+>;
 
-type State = NavigationState<Route>;
-
-export default class TopBarTextExample extends PureComponent<void, *, State> {
-  static title = 'Scroll views with lazy load';
+export default class TopBarTextExample extends PureComponent<*, State> {
+  static title = 'Scroll views';
   static backgroundColor = '#fff';
   static tintColor = '#222';
   static appbarElevation = 0;
 
-  state: State = {
+  state = {
     index: 0,
     routes: [
       { key: '1', title: 'First' },
@@ -29,15 +29,14 @@ export default class TopBarTextExample extends PureComponent<void, *, State> {
     ],
   };
 
-  _first: Object;
-  _second: Object;
-  _third: Object;
+  _first: ?BasicListView;
+  _second: ?BasicListView;
+  _third: ?BasicListView;
 
-  _handleIndexChange = index => {
+  _handleIndexChange = index =>
     this.setState({
       index,
     });
-  };
 
   _handleTabItemPress = ({ route }) => {
     if (route !== this.state.routes[this.state.index]) {
@@ -79,33 +78,31 @@ export default class TopBarTextExample extends PureComponent<void, *, State> {
     );
   };
 
-  _renderHeader = props => {
-    return (
-      <TabBar
-        {...props}
-        pressColor="rgba(255, 64, 129, .5)"
-        onTabPress={this._handleTabItemPress}
-        renderLabel={this._renderLabel(props)}
-        indicatorStyle={styles.indicator}
-        tabStyle={styles.tab}
-        style={styles.tabbar}
-      />
-    );
-  };
+  _renderHeader = props => (
+    <TabBar
+      {...props}
+      pressColor="rgba(255, 64, 129, .5)"
+      onTabPress={this._handleTabItemPress}
+      renderLabel={this._renderLabel(props)}
+      indicatorStyle={styles.indicator}
+      tabStyle={styles.tab}
+      style={styles.tabbar}
+    />
+  );
 
   _renderScene = ({ route }) => {
     switch (route.key) {
       case '1':
         return (
           <BasicListView
-            ref={el => (this._first = el)}
+            ref={(el: ?BasicListView) => (this._first = el)}
             style={[styles.page, { backgroundColor: '#E3F4DD' }]}
           />
         );
       case '2':
         return (
           <BasicListView
-            ref={el => (this._second = el)}
+            ref={(el: ?BasicListView) => (this._second = el)}
             style={[styles.page, { backgroundColor: '#E6BDC5' }]}
             initialListSize={1}
           />
@@ -113,7 +110,7 @@ export default class TopBarTextExample extends PureComponent<void, *, State> {
       case '3':
         return (
           <BasicListView
-            ref={el => (this._third = el)}
+            ref={(el: ?BasicListView) => (this._third = el)}
             style={[styles.page, { backgroundColor: '#EDD8B5' }]}
             initialListSize={1}
           />
@@ -131,7 +128,6 @@ export default class TopBarTextExample extends PureComponent<void, *, State> {
         renderScene={this._renderScene}
         renderHeader={this._renderHeader}
         onIndexChange={this._handleIndexChange}
-        lazy
       />
     );
   }

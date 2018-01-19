@@ -1,6 +1,6 @@
 /* @flow */
 
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import { Animated, View } from 'react-native';
 import TabViewPagerScroll from '../src/TabViewPagerScroll';
@@ -24,6 +24,9 @@ it('renders only focused child until layout', () => {
       jumpToIndex={jest.fn()}
       getLastPosition={jest.fn()}
       subscribe={jest.fn()}
+      panX={new Animated.Value(0)}
+      offsetX={new Animated.Value(0)}
+      useNativeDriver={false}
     >
       <View />
       <View />
@@ -31,29 +34,47 @@ it('renders only focused child until layout', () => {
     </TabViewPagerScroll>
   );
 
-  expect(component.find({ testID: 'first' }).first().props().children).toBe(
-    null
-  );
   expect(
-    component.find({ testID: 'second' }).first().props().children
+    component
+      .find({ testID: 'first' })
+      .first()
+      .props().children
+  ).toBe(null);
+  expect(
+    component
+      .find({ testID: 'second' })
+      .first()
+      .props().children
   ).not.toBe(null);
-  expect(component.find({ testID: 'third' }).first().props().children).toBe(
-    null
-  );
+  expect(
+    component
+      .find({ testID: 'third' })
+      .first()
+      .props().children
+  ).toBe(null);
 
   component.setProps({
     layout: { height: 320, width: 240, measured: false },
   });
 
-  expect(component.find({ testID: 'first' }).first().props().children).not.toBe(
-    null
-  );
   expect(
-    component.find({ testID: 'second' }).first().props().children
+    component
+      .find({ testID: 'first' })
+      .first()
+      .props().children
   ).not.toBe(null);
-  expect(component.find({ testID: 'third' }).first().props().children).not.toBe(
-    null
-  );
+  expect(
+    component
+      .find({ testID: 'second' })
+      .first()
+      .props().children
+  ).not.toBe(null);
+  expect(
+    component
+      .find({ testID: 'third' })
+      .first()
+      .props().children
+  ).not.toBe(null);
 });
 
 it('sets initial scroll position according to navigation state index', () => {
@@ -75,6 +96,9 @@ it('sets initial scroll position according to navigation state index', () => {
       jumpToIndex={jest.fn()}
       getLastPosition={jest.fn()}
       subscribe={jest.fn()}
+      panX={new Animated.Value(0)}
+      offsetX={new Animated.Value(0)}
+      useNativeDriver={false}
     >
       <View />
       <View />
@@ -82,7 +106,6 @@ it('sets initial scroll position according to navigation state index', () => {
     </TabViewPagerScroll>
   );
 
-  /* $FlowFixMe */
   expect(component.dive().instance().props.contentOffset).toEqual({
     x: 240 * 2,
     y: 0,

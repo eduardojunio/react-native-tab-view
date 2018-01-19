@@ -1,6 +1,6 @@
 /* @flow */
 
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import {
   Animated,
   View,
@@ -11,25 +11,25 @@ import { TabViewAnimated } from 'react-native-tab-view';
 import { Ionicons } from '@expo/vector-icons';
 import BasicListView from './BasicListView';
 
-import type { NavigationState } from 'react-native-tab-view/types';
+import type { Route, NavigationState } from 'react-native-tab-view/types';
 
 const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
 
-type Route = {
-  key: string,
-  title: string,
-  icon: string,
-};
+type State = NavigationState<
+  Route<{
+    key: string,
+    title: string,
+    icon: string,
+  }>
+>;
 
-type State = NavigationState<Route>;
-
-export default class TopBarIconExample extends PureComponent<void, *, State> {
+export default class TopBarIconExample extends React.Component<*, State> {
   static title = 'No animation';
   static backgroundColor = '#f4f4f4';
   static tintColor = '#222';
   static appbarElevation = 4;
 
-  state: State = {
+  state = {
     index: 0,
     routes: [
       { key: '1', title: 'Featured', icon: 'ios-star' },
@@ -40,11 +40,10 @@ export default class TopBarIconExample extends PureComponent<void, *, State> {
     ],
   };
 
-  _handleIndexChange = index => {
+  _handleIndexChange = index =>
     this.setState({
       index,
     });
-  };
 
   _renderLabel = ({ position, navigationState }) => ({ route, index }) => {
     const inputRange = navigationState.routes.map((x, i) => i);
@@ -62,13 +61,7 @@ export default class TopBarIconExample extends PureComponent<void, *, State> {
     );
   };
 
-  _renderIcon = ({ navigationState, position }) => ({
-    route,
-    index,
-  }: {
-    route: Route,
-    index: number,
-  }) => {
+  _renderIcon = ({ navigationState, position }) => ({ route, index }) => {
     const inputRange = navigationState.routes.map((x, i) => i);
     const filledOpacity = position.interpolate({
       inputRange,
@@ -94,25 +87,23 @@ export default class TopBarIconExample extends PureComponent<void, *, State> {
     );
   };
 
-  _renderFooter = props => {
-    return (
-      <View style={styles.tabbar}>
-        {props.navigationState.routes.map((route, index) => {
-          return (
-            <TouchableWithoutFeedback
-              key={route.key}
-              onPress={() => props.jumpToIndex(index)}
-            >
-              <Animated.View style={styles.tab}>
-                {this._renderIcon(props)({ route, index })}
-                {this._renderLabel(props)({ route, index })}
-              </Animated.View>
-            </TouchableWithoutFeedback>
-          );
-        })}
-      </View>
-    );
-  };
+  _renderFooter = props => (
+    <View style={styles.tabbar}>
+      {props.navigationState.routes.map((route, index) => {
+        return (
+          <TouchableWithoutFeedback
+            key={route.key}
+            onPress={() => props.jumpToIndex(index)}
+          >
+            <Animated.View style={styles.tab}>
+              {this._renderIcon(props)({ route, index })}
+              {this._renderLabel(props)({ route, index })}
+            </Animated.View>
+          </TouchableWithoutFeedback>
+        );
+      })}
+    </View>
+  );
 
   _renderScene = ({ route }) => {
     switch (route.key) {

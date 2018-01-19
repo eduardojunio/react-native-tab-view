@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable import/no-commonjs */
 
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import {
   Animated,
   View,
@@ -12,7 +12,13 @@ import {
 } from 'react-native';
 import { TabViewAnimated, TabViewPagerPan } from 'react-native-tab-view';
 
-import type { NavigationState } from 'react-native-tab-view/types';
+import type { Route, NavigationState } from 'react-native-tab-view/types';
+
+type State = NavigationState<
+  Route<{
+    key: string,
+  }>
+>;
 
 const ALBUMS = {
   'Abbey Road': require('../assets/album-art-1.jpg'),
@@ -30,17 +36,11 @@ const initialLayout = {
   width: Dimensions.get('window').width,
 };
 
-type Route = {
-  key: string,
-};
-
-type State = NavigationState<Route>;
-
-export default class CoverflowExample extends PureComponent<void, *, State> {
+export default class CoverflowExample extends React.Component<*, State> {
   static title = 'Coverflow';
   static appbarElevation = 0;
 
-  state: State = {
+  state = {
     index: 2,
     routes: Object.keys(ALBUMS).map(key => ({ key })),
   };
@@ -88,28 +88,21 @@ export default class CoverflowExample extends PureComponent<void, *, State> {
     };
   };
 
-  _handleIndexChange = index => {
+  _handleIndexChange = index =>
     this.setState({
       index,
     });
-  };
 
-  _renderScene = props => {
-    return (
-      <Animated.View style={[styles.page, this._buildCoverFlowStyle(props)]}>
-        <View style={styles.album}>
-          <Image source={ALBUMS[props.route.key]} style={styles.cover} />
-        </View>
-        <Text style={styles.label}>
-          {props.route.key}
-        </Text>
-      </Animated.View>
-    );
-  };
+  _renderScene = props => (
+    <Animated.View style={[styles.page, this._buildCoverFlowStyle(props)]}>
+      <View style={styles.album}>
+        <Image source={ALBUMS[props.route.key]} style={styles.cover} />
+      </View>
+      <Text style={styles.label}>{props.route.key}</Text>
+    </Animated.View>
+  );
 
-  _renderPager = props => {
-    return <TabViewPagerPan {...props} />;
-  };
+  _renderPager = props => <TabViewPagerPan {...props} />;
 
   render() {
     return (
